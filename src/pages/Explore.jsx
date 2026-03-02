@@ -93,20 +93,36 @@ function CustomDropdown({ label, options, value, onChange }) {
 export default function Explore() {
   const [recipes, setRecipes] = useState([]);
   const [dbCategories, setDbCategories] = useState([]);
+  const [authors, setAuthors] = useState([]);
   
   const [q, setQ] = useState("");
-  const [category, setCategory] = useState(null); // Will store category object { id, name }
+  const [category, setCategory] = useState(null);
+  const [selectedAuthor, setSelectedAuthor] = useState(null);
   const [publishedFrom, setPublishedFrom] = useState("");
   const [publishedTo, setPublishedTo] = useState("");
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState(null);
   
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isAuthorOpen, setIsAuthorOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Fetch categories on mount
     api.get('/categories').then(res => setDbCategories(res.data.data)).catch(console.error);
+    // Fetch all published recipes to extract unique authors
+    api.get('/recipes', { params: { per_page: 50 } }).then(res => {
+      const data = res.data.data || [];
+      const uniqueAuthors = [];
+      const seen = new Set();
+      data.forEach(r => {
+        if (r.author && r.author.id && !seen.has(r.author.id)) {
+          seen.add(r.author.id);
+          uniqueAuthors.push(r.author);
+        }
+      });
+      setAuthors(uniqueAuthors);
+    }).catch(console.error);
   }, []);
 
   const fetchRecipes = async (currentPage = 1) => {
@@ -120,6 +136,9 @@ export default function Explore() {
       };
       if (category) {
         params['category_ids[]'] = category.id;
+      }
+      if (selectedAuthor) {
+        params['author_id'] = selectedAuthor.id;
       }
       
       const res = await api.get('/recipes', { params });
@@ -204,7 +223,7 @@ export default function Explore() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder="¿Qué quieres cocinar? (Tip: Busca también por autor)" 
+                placeholder="¿Qué quieres cocinar?" 
                 className="w-full px-6 py-5 outline-none text-[#1a2e35] bg-transparent text-xl font-black placeholder:text-lg" 
               />
             </div>
@@ -227,6 +246,31 @@ export default function Explore() {
                     <button onClick={() => { setCategory(null); setIsCategoryOpen(false); }} className="w-full text-left px-5 py-3 text-lg font-bold text-gray-500 hover:bg-gray-50 transition-colors">Todas</button>
                     {dbCategories.map((opt) => (
                       <button key={opt.id} onClick={() => { setCategory(opt); setIsCategoryOpen(false); }} className="w-full text-left px-5 py-3 text-lg font-bold text-[#1a2e35] hover:bg-green-50 hover:text-green-700 transition-colors">{opt.name}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* AUTHOR FILTER */}
+            <div className="flex-[0.7] min-w-[145px]">
+              <div className="relative">
+                <button 
+                  onClick={() => setIsAuthorOpen(!isAuthorOpen)}
+                  className="w-full bg-white rounded-3xl px-4 py-5 text-left shadow-md border-2 border-transparent hover:border-green-500 transition-all flex justify-between items-center focus:outline-none"
+                >
+                  <span className={`text-base font-black truncate ${selectedAuthor ? 'text-[#1a2e35]' : 'text-gray-400'}`}>
+                    {selectedAuthor ? selectedAuthor.name : "Autor"}
+                  </span>
+                  <svg className={`w-5 h-5 text-gray-400 transition-transform ${isAuthorOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {isAuthorOpen && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[100] max-h-60 overflow-y-auto py-2">
+                    <button onClick={() => { setSelectedAuthor(null); setIsAuthorOpen(false); }} className="w-full text-left px-5 py-3 text-lg font-bold text-gray-500 hover:bg-gray-50 transition-colors">Todos</button>
+                    {authors.map((a) => (
+                      <button key={a.id} onClick={() => { setSelectedAuthor(a); setIsAuthorOpen(false); }} className="w-full text-left px-5 py-3 text-lg font-bold text-[#1a2e35] hover:bg-green-50 hover:text-green-700 transition-colors">{a.name}</button>
                     ))}
                   </div>
                 )}
