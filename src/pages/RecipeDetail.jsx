@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../api/axios';
 import tomateImg from '../assets/tomate.png';
+import recipeImg from '../assets/recipe_placeholder.png';
 
 export default function RecipeDetail() {
   const { id } = useParams();
@@ -76,9 +77,13 @@ export default function RecipeDetail() {
       {/* Full-width Top Header (Matches Explore) */}
       <header className="w-full h-24 bg-[#ffb800] px-8 flex justify-between items-center shadow-md relative z-50">
         <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center h-full">
-          <Link to="/" className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg transform -rotate-12 hover:rotate-0 transition-transform flex-shrink-0 overflow-hidden p-2">
-            <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link to="/" className="flex items-center group">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-inner transform group-hover:scale-105 transition-transform overflow-hidden p-2">
+                <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
+              </div>
+            </Link>
+          </div>
           <div className="flex gap-4">
             <Link to="/explore" className="px-6 py-2.5 bg-white text-[#ffb800] font-black text-lg md:text-xl rounded-full shadow hover:bg-gray-50 transition-colors">Explorar</Link>
             {isAuth ? (
@@ -117,7 +122,7 @@ export default function RecipeDetail() {
               
               {/* Main Image */}
               <div className="rounded-[2.5rem] overflow-hidden shadow-md border border-gray-100 aspect-[16/10] bg-gray-50 flex items-center justify-center">
-                <img src={recipe.main_image?.url || 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1600&q=80'} alt={recipe.title} className="w-full h-full object-cover" />
+                <img src={recipe.main_image?.url || recipeImg} alt={recipe.title} className="w-full h-full object-cover" />
               </div>
 
               {/* Gallery Thumbnails */}

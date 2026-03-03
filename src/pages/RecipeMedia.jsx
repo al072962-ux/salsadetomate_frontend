@@ -1,6 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/axios';
+import tomateImg from '../assets/tomate.png';
 
 const RecipeMedia = () => {
   const { id } = useParams();
@@ -84,19 +85,16 @@ const RecipeMedia = () => {
   return (
     <div className="bg-gray-50 min-h-screen font-sans flex flex-col">
       <header className="w-full h-24 bg-[#ffb800] px-8 flex justify-between items-center shadow-md relative z-50">
-        <div className="max-w-[1400px] mx-auto w-full flex justify-between items-center h-full">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="bg-white p-2 rounded-full shadow-inner transform group-hover:scale-105 transition-transform">
-              <span className="text-3xl" role="img" aria-label="tomato logo"></span>
+        <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center h-full">
+          <Link to="/" className="flex items-center group">
+            <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-inner transform group-hover:scale-105 transition-transform overflow-hidden p-2">
+              <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
             </div>
-            <span className="text-2xl font-black text-[#1a2e35] tracking-tight hidden sm:block">
-              Salsa de Tomate
-            </span>
           </Link>
           <div className="flex gap-4">
             {localStorage.getItem('access_token') ? (
               <>
-                <Link to="/explore" className="px-6 py-2.5 outline outline-2 outline-white text-white font-black text-lg md:text-xl rounded-full hover:bg-white/10 transition-colors hidden sm:block">Explorar</Link>
+                <Link to="/explore" className="px-6 py-2.5 bg-white text-[#ffb800] font-black text-lg md:text-xl rounded-full shadow hover:bg-gray-50 transition-colors hidden sm:block">Explorar</Link>
                 <Link to="/my-recipes" className="px-6 py-2.5 bg-white text-[#ffb800] font-black text-lg md:text-xl rounded-full shadow hover:bg-gray-50 transition-colors">Mis recetas</Link>
                 <button onClick={() => { localStorage.removeItem('access_token'); window.location.href='/login'; }} className="px-6 py-2.5 bg-white text-red-500 font-black text-lg md:text-xl rounded-full shadow hover:bg-gray-50 transition-colors border-2 border-red-100 hidden md:block">Salir</button>
               </>

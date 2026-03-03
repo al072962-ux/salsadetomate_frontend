@@ -36,30 +36,34 @@ export default function LandingPage() {
       ></div>
 
       {/* Dynamic Header Section */}
-      <header className="relative w-full pt-16 pb-24 md:py-32 flex flex-col items-center z-10">
+      <header className="relative w-full pt-8 pb-16 md:pt-12 md:pb-24 flex flex-col items-center z-10">
         
         {/* Navigation / Header Actions (Mock for visual presence, optional to extract) */}
-        <div className="absolute top-0 left-0 w-full p-6 flex justify-between z-50">
-           <Link to="/" className="w-12 h-12" aria-label="tomato logo">
-             <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain drop-shadow-md hover:scale-105 transition-transform" />
-           </Link>
-           <nav className="flex gap-4">
-            {localStorage.getItem('access_token') ? (
-              <>
-                <Link to="/explore" className="px-6 py-2.5 bg-white text-brand-orange font-bold rounded-full shadow hover:bg-gray-50">Explorar</Link>
-                <Link to="/my-recipes" className="px-6 py-2.5 outline outline-2 outline-white text-white font-bold rounded-full hover:bg-white/10">Mis recetas</Link>
-                <button onClick={() => { localStorage.removeItem('access_token'); window.location.href='/login'; }} className="px-6 py-2.5 bg-white text-red-500 font-bold rounded-full shadow hover:bg-gray-50 border-2 border-red-100">Salir</button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="px-6 py-2.5 bg-white text-brand-orange font-bold rounded-full shadow hover:bg-gray-50">Ingresar</Link>
-                <Link to="/register" className="px-6 py-2.5 outline outline-2 outline-white text-white font-bold rounded-full hover:bg-white/10">Regístrate</Link>
-              </>
-            )}
-           </nav>
+        <div className="absolute top-0 left-0 w-full z-50 px-8 h-24 flex items-center">
+          <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center h-full">
+            <Link to="/" className="flex items-center group">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-inner transform group-hover:scale-105 transition-transform overflow-hidden p-2">
+                <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
+              </div>
+            </Link>
+            <nav className="flex gap-4">
+              {localStorage.getItem('access_token') ? (
+                <>
+                  <Link to="/explore" className="px-6 py-2.5 bg-white text-[#ffb800] font-black text-lg md:text-xl rounded-full shadow hover:bg-gray-50 transition-colors">Explorar</Link>
+                  <Link to="/my-recipes" className="px-6 py-2.5 bg-white text-[#ffb800] font-black text-lg md:text-xl rounded-full shadow hover:bg-gray-50 transition-colors">Mis recetas</Link>
+                  <button onClick={() => { localStorage.removeItem('access_token'); window.location.href='/login'; }} className="px-6 py-2.5 bg-white text-red-500 font-black text-lg md:text-xl rounded-full shadow hover:bg-gray-50 transition-colors border-2 border-red-100 hidden md:block">Salir</button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="px-6 py-2.5 bg-white text-[#ffb800] font-black text-lg md:text-xl rounded-full shadow hover:bg-gray-50 transition-colors">Ingresar</Link>
+                  <Link to="/register" className="px-6 py-2.5 outline outline-2 outline-white text-white font-black text-lg md:text-xl rounded-full hover:bg-white/10 transition-colors">Regístrate</Link>
+                </>
+              )}
+            </nav>
+          </div>
         </div>
 
-        <div className="container mx-auto px-6 max-w-7xl flex flex-col md:flex-row items-center justify-between z-20 relative mt-12">
+        <div className="container mx-auto px-6 max-w-7xl flex flex-col md:flex-row items-center justify-between z-20 relative mt-6 md:mt-10">
           
           {/* Text Content */}
           <div className="w-full md:w-[45%] flex flex-col items-start gap-6 pt-10 md:pt-0">

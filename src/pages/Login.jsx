@@ -29,26 +29,23 @@ export default function Login() {
     <div className="min-h-screen bg-[#ffb800] relative overflow-hidden flex flex-col font-sans">
       
       {/* Top Header Franja Naranja */}
-      <header className="relative z-50 w-full h-24 bg-[#ffb800] px-8 flex justify-between items-center flex-shrink-0 shadow-[0_2px_10px_rgba(0,0,0,0.1)]">
-        <div className="max-w-7xl mx-auto w-full flex justify-between items-center">
-          {/* Left Side: Logo and Avatar */}
-          <div className="flex items-center gap-4">
-            <Link to="/" className="flex items-center">
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md border-2 border-white hover:scale-105 transition-transform overflow-hidden p-1.5">
+      <header className="relative z-50 w-full h-24 bg-[#ffb800] px-8 flex justify-between items-center flex-shrink-0 shadow-md">
+        <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center h-full">
+          {/* Left Side: Logo */}
+          <div className="flex items-center gap-6">
+            <Link to="/" className="flex items-center group">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-inner transform group-hover:scale-105 transition-transform overflow-hidden p-2">
                 <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
               </div>
             </Link>
-            <div className="w-10 h-10 rounded-full overflow-hidden shadow-sm bg-gray-200 border-2 border-[#ffb800]">
-              <img src="https://i.pravatar.cc/100?img=32" alt="Avatar" className="w-full h-full object-cover"/>
-            </div>
           </div>
           
           {/* Navigation Buttons (Pill style) */}
           <div className="flex gap-4">
-            <Link to="/login" className="px-6 py-2 bg-white text-[#ffb800] font-bold rounded-full shadow-sm hover:bg-gray-50 transition">
+            <Link to="/login" className="px-6 py-2.5 bg-white text-[#ffb800] font-black text-lg md:text-xl rounded-full shadow hover:bg-gray-50 transition-colors">
               Ingresar
             </Link>
-            <Link to="/register" className="px-6 py-2 bg-[#ffb800] text-white font-bold rounded-full border border-white hover:bg-[#e0a200] shadow-sm transition">
+            <Link to="/register" className="px-6 py-2.5 outline outline-2 outline-white text-white font-black text-lg md:text-xl rounded-full hover:bg-white/10 transition-colors">
               Regístrate
             </Link>
           </div>
