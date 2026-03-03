@@ -9,6 +9,8 @@ import MyRecipes from './pages/MyRecipes'
 import Categories from './pages/Categories'
 import RecipeMedia from './pages/RecipeMedia'
 import './index.css'
+import { ToastProvider } from './components/Toast'
+
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('access_token');
@@ -20,7 +22,9 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
   return (
-    <BrowserRouter>
+    <ToastProvider>
+      <BrowserRouter>
+
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
@@ -35,7 +39,8 @@ function App() {
         <Route path="/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
         <Route path="/edit/:id/media" element={<ProtectedRoute><RecipeMedia /></ProtectedRoute>} />
       </Routes>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ToastProvider>
   )
 }
 

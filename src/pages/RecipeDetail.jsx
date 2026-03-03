@@ -3,12 +3,20 @@ import { Link, useParams } from 'react-router-dom';
 import { api } from '../api/axios';
 import tomateImg from '../assets/tomate.png';
 import recipeImg from '../assets/recipe_placeholder.png';
+import customLogo from '../assets/logo.png';
+import { useToast } from '../components/Toast';
+
+
+
 
 export default function RecipeDetail() {
   const { id } = useParams();
+  const toast = useToast();
+
   const [recipe, setRecipe] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeMediaUrl, setActiveMediaUrl] = useState(null);
   
   // Comment form state
   const [commentBody, setCommentBody] = useState("");
@@ -54,10 +62,10 @@ export default function RecipeDetail() {
         setComments([res.data.data, ...comments]);
         setCommentBody("");
       }
-      alert('Opinión guardada correctamente!');
+      toast.success('¡Opinión guardada correctamente!');
       // Update recipe object to reflect new ratings if preferred (or just rely on the alert)
     } catch (err) {
-      alert('Error al guardar opinión');
+      toast.error('Error al guardar opinión');
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -78,10 +86,11 @@ export default function RecipeDetail() {
       <header className="w-full h-24 bg-[#ffb800] px-8 flex justify-between items-center shadow-md relative z-50">
         <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center h-full">
           <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center group">
+            <Link to="/" className="flex items-center group gap-4">
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-inner transform group-hover:scale-105 transition-transform overflow-hidden p-2">
                 <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
               </div>
+              <img src={customLogo} alt="Salsa de Tomate" style={{width: '250px', marginTop: '8px'}} />
             </Link>
           </div>
           <div className="flex gap-4">
@@ -119,22 +128,67 @@ export default function RecipeDetail() {
             
             {/* Left Column: Images, Ingredients, Instructions */}
             <div className="lg:col-span-8 flex flex-col gap-8">
-              
-              {/* Main Image */}
-              <div className="rounded-[2.5rem] overflow-hidden shadow-md border border-gray-100 aspect-[16/10] bg-gray-50 flex items-center justify-center">
-                <img src={recipe.main_image?.url || recipeImg} alt={recipe.title} className="w-full h-full object-cover" />
-              </div>
+              {/* Helper to check and extract YouTube ID */}
+              {(() => {
+                const getYouTubeId = (url) => {
+                  if (!url) return null;
+                  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                  const match = url.match(regExp);
+                  return (match && match[2].length === 11) ? match[2] : null;
+                };
 
-              {/* Gallery Thumbnails */}
-              {recipe.media && recipe.media.filter(img => !img.is_primary).length > 0 && (
-                <div className="grid grid-cols-5 gap-4">
-                  {recipe.media.filter(img => !img.is_primary).map((img, idx) => (
-                    <div key={idx} className="rounded-2xl overflow-hidden shadow-sm aspect-[4/3] border-2 border-transparent hover:border-green-500 cursor-pointer transition-colors bg-gray-50">
-                      <img src={img.url} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                const mainMediaUrl = activeMediaUrl || recipe.main_image?.url || recipeImg;
+                const mainYtId = getYouTubeId(mainMediaUrl);
+
+                return (
+                  <>
+                    {/* Main Image or Video */}
+                    <div className="rounded-[2.5rem] overflow-hidden shadow-md border-2 border-transparent bg-black aspect-[16/10] flex items-center justify-center">
+                      {mainYtId ? (
+                        <iframe 
+                          className="w-full h-full"
+                          src={`https://www.youtube.com/embed/${mainYtId}?rel=0&autoplay=1`} 
+                          title="YouTube video player" 
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                          allowFullScreen
+                        ></iframe>
+                      ) : (
+                        <img src={mainMediaUrl} alt={recipe.title} className="w-full h-full object-cover bg-gray-50 bg-white" />
+                      )}
                     </div>
-                  ))}
-                </div>
-              )}
+
+                    {/* Gallery Thumbnails */}
+                    {recipe.media && recipe.media.length > 1 && (
+                      <div className="grid grid-cols-5 gap-4">
+                        {recipe.media.map((img, idx) => {
+                          const ytId = getYouTubeId(img.url);
+                          const isActive = mainMediaUrl === img.url;
+                          return (
+                            <div 
+                              key={idx} 
+                              onClick={() => setActiveMediaUrl(img.url)}
+                              className={`rounded-2xl overflow-hidden shadow-sm aspect-[4/3] border-[3px] cursor-pointer transition-all duration-300 bg-gray-50 flex items-center justify-center relative ${isActive ? 'border-green-500 scale-[1.03] shadow-md' : 'border-transparent hover:border-green-300 opacity-70 hover:opacity-100'}`}
+                            >
+                              {ytId ? (
+                                <div className="w-full h-full bg-black relative">
+                                  <img src={`https://img.youtube.com/vi/${ytId}/mqdefault.jpg`} alt={`Video Tumbnail ${idx}`} className="w-full h-full object-cover opacity-80" />
+                                  <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="bg-red-600 rounded-full w-10 h-10 md:w-12 md:h-12 flex items-center justify-center pl-1 shadow-lg">
+                                      <svg className="w-5 h-5 md:w-6 md:h-6 text-white fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <img src={img.url} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
 
               {/* Action Bar (Time, Rating, Tags) */}
               <div className="flex flex-wrap gap-4 items-center">
@@ -251,6 +305,6 @@ export default function RecipeDetail() {
           </div>
           
         </main>
-      </div>
+    </div>
   );
 }

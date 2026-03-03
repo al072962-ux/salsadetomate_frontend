@@ -3,6 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/axios';
 import platilloImg from '../assets/platillo.png';
 import tomateImg from '../assets/tomate.png';
+import customLogo from '../assets/logo.png';
+import recipeImg from '../assets/recipe_placeholder.png';
+import { useToast } from '../components/Toast';
+
+
 
 function MyRecipes() {
   const [activeTab, setActiveTab] = useState('publicadas');
@@ -10,6 +15,8 @@ function MyRecipes() {
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const navigate = useNavigate();
+  const toast = useToast();
+
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -41,12 +48,14 @@ function MyRecipes() {
   }, [navigate]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Seguro que deseas eliminar esta receta?')) return;
+    const confirmed = await toast.confirm('¿Seguro que deseas eliminar esta receta?', { danger: true, confirmText: 'Eliminar' });
+    if (!confirmed) return;
+
     try {
       await api.delete(`/recipes/${id}`);
       setRecipes(recipes.filter(r => r.id !== id));
     } catch (err) {
-      alert('Error eliminando receta');
+      toast.error('Error eliminando receta');
     }
   };
 
@@ -55,18 +64,22 @@ function MyRecipes() {
       await api.post(`/recipes/${id}/publish`);
       setRecipes(recipes.map(r => r.id === id ? { ...r, status: 'published' } : r));
       setActiveTab('publicadas');
+      toast.success('¡Receta publicada con éxito!');
+
     } catch (err) {
       if (err.response?.status === 422) {
         const msg = err.response.data.message || '';
         if (msg.toLowerCase().includes('foto') || msg.toLowerCase().includes('image')) {
-          if (window.confirm(msg + '\n\n¿Quieres ir a la galería para subir una foto ahora?')) {
+          const goGallery = await toast.confirm(msg + '\n\n¿Quieres ir a la galería para subir una foto ahora?', { confirmText: 'Ir a galería' });
+          if (goGallery) {
+
             navigate(`/edit/${id}/media`);
           }
           return;
         }
-        alert(msg);
+        toast.error(msg);
       } else {
-        alert('Error publicando la receta');
+        toast.error('Error publicando la receta');
         console.error(err);
       }
     }
@@ -94,9 +107,12 @@ function MyRecipes() {
       {/* Full-width Top Header */}
       <header className="w-full h-24 bg-[#ffb800] px-8 flex justify-between items-center shadow-md relative z-50">
         <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center h-full">
-          <Link to="/" className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg transform -rotate-12 hover:rotate-0 transition-transform flex-shrink-0 overflow-hidden p-2">
-            <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link to="/" className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg transform -rotate-12 hover:rotate-0 transition-transform flex-shrink-0 overflow-hidden p-2">
+              <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
+            </Link>
+              <img src={customLogo} alt="Salsa de Tomate" style={{width: '250px', marginTop: '8px'}} />
+          </div>
           <div className="flex gap-4">
             <Link to="/explore" className="px-6 py-2.5 outline outline-2 outline-white text-white font-black text-lg md:text-xl rounded-full hover:bg-white/10 transition-colors hidden sm:block">Explorar Recetas</Link>
             <button onClick={handleLogout} className="px-6 py-2.5 bg-white text-red-500 font-black text-lg md:text-xl rounded-full shadow hover:bg-gray-50 transition-colors border-2 border-red-100">Cerrar Sesión</button>
@@ -176,7 +192,7 @@ function MyRecipes() {
               ) : (
                 currentList.map((recipe) => (
                   <div key={recipe.id} className="flex flex-col sm:flex-row bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                    <img src={recipe.main_image?.url || 'https://images.unsplash.com/photo-1515443961218-a51367888e4b?auto=format&fit=crop&q=80&w=400'} alt={recipe.title} className="w-full sm:w-56 h-48 sm:h-auto object-cover flex-shrink-0" />
+                    <img src={recipe.main_image?.url || recipeImg} alt={recipe.title} className="w-full sm:w-56 h-48 sm:h-auto object-cover flex-shrink-0" />
                     <div className="p-6 flex flex-col justify-between flex-grow">
                       <div>
                         <div className="flex justify-between items-start mb-2">

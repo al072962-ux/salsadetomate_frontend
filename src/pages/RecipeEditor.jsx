@@ -2,10 +2,16 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/axios';
 import tomateImg from '../assets/tomate.png';
+import customLogo from '../assets/logo.png';
+import { useToast } from '../components/Toast';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
+
 
 function RecipeEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
   const isEditMode = !!id;
 
   const [title, setTitle] = useState('');
@@ -25,6 +31,8 @@ function RecipeEditor() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [loading, setLoading] = useState(isEditMode);
   const [saving, setSaving] = useState(false);
+  const [hasMainImage, setHasMainImage] = useState(false);
+
 
   useEffect(() => {
     // Load categories
@@ -50,9 +58,14 @@ function RecipeEditor() {
         if (data.categories?.length > 0) {
           setSelectedCategories(data.categories.map(c => c.id));
         }
+
+        if (data.main_image) {
+          setHasMainImage(true);
+        }
+
       }).catch(err => {
         console.error(err);
-        alert('Error cargando receta');
+        toast.error('Error cargando receta');
         navigate('/my-recipes');
       }).finally(() => {
         setLoading(false);
@@ -82,9 +95,15 @@ function RecipeEditor() {
 
   const handleSave = async (status) => {
     if (!title.trim()) {
-      alert("El título es obligatorio");
+      toast.warning('El título es obligatorio');
       return;
     }
+
+    if (status === 'published' && !hasMainImage) {
+      toast.warning('La receta debe tener al menos una foto antes de publicarse. Por favor, guarda el borrador y sube una foto en la galería.');
+      return;
+    }
+
 
     setSaving(true);
     const payload = {
@@ -101,15 +120,22 @@ function RecipeEditor() {
     try {
       if (isEditMode) {
         await api.put(`/recipes/${id}`, payload);
-        alert('Receta actualizada!');
+        toast.success('¡Receta actualizada!');
+        navigate('/my-recipes');
       } else {
-        await api.post('/recipes', payload);
-        alert('Receta creada!');
+        const res = await api.post('/recipes', payload);
+        const newId = res.data.data?.id || res.data.id;
+        toast.success('¡Receta creada! Ahora puedes añadir fotos.');
+        navigate(`/edit/${newId}`);
       }
-      navigate('/my-recipes');
     } catch (err) {
-      alert('Error guardando receta');
-      console.error(err);
+      console.error('Error detail:', err);
+      const errorMsg = err.response?.data?.errors 
+        ? Object.values(err.response.data.errors).flat().join(' ')
+        : err.response?.data?.message || err.message || 'Error guardando receta';
+      
+      toast.error(errorMsg);
+
     } finally {
       setSaving(false);
     }
@@ -124,9 +150,12 @@ function RecipeEditor() {
       {/* Full-width Top Header */}
       <header className="w-full h-24 bg-[#ffb800] px-8 flex justify-between items-center shadow-md relative z-50">
         <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center h-full">
-          <Link to="/" className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg transform -rotate-12 hover:rotate-0 transition-transform flex-shrink-0 overflow-hidden p-2">
-            <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link to="/" className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg transform -rotate-12 hover:rotate-0 transition-transform flex-shrink-0 overflow-hidden p-2">
+              <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
+            </Link>
+              <img src={customLogo} alt="Salsa de Tomate" style={{width: '250px', marginTop: '8px'}} />
+          </div>
           <div className="flex gap-4">
             {localStorage.getItem('access_token') ? (
               <>
@@ -177,7 +206,22 @@ function RecipeEditor() {
                 
                 <div>
                   <label className="block text-gray-700 font-bold mb-2">Descripción</label>
-                  <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe la receta en 1-2 líneas..." rows="3" className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#ffb800] focus:border-transparent transition-all font-bold text-gray-700"></textarea>
+                  <div className="quill-wrapper rounded-xl border border-gray-200 overflow-hidden focus-within:ring-2 focus-within:ring-[#ffb800] focus-within:border-transparent transition-all">
+                    <ReactQuill
+                      theme="snow"
+                      value={description}
+                      onChange={setDescription}
+                      placeholder="Describe la receta..."
+                      modules={{
+                        toolbar: [
+                          ['bold', 'italic', 'underline'],
+                          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                          ['link'],
+                          ['clean']
+                        ]
+                      }}
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

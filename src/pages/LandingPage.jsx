@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import heroBowl from '../assets/plato.png'; 
 import { api } from '../api/axios';
 import tomateImg from '../assets/tomate.png';
+import customLogo from '../assets/logo.png';
+
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -41,10 +43,11 @@ export default function LandingPage() {
         {/* Navigation / Header Actions (Mock for visual presence, optional to extract) */}
         <div className="absolute top-0 left-0 w-full z-50 px-8 h-24 flex items-center">
           <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center h-full">
-            <Link to="/" className="flex items-center group">
+            <Link to="/" className="flex items-center group gap-4">
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-inner transform group-hover:scale-105 transition-transform overflow-hidden p-2">
                 <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
               </div>
+              <img src={customLogo} alt="Salsa de Tomate" style={{width: '250px', marginTop: '8px'}} />
             </Link>
             <nav className="flex gap-4">
               {localStorage.getItem('access_token') ? (
@@ -102,6 +105,8 @@ export default function LandingPage() {
                 <div className="absolute top-[30%] right-[5%] w-5 h-7 bg-gray-900 rounded-[50%] -rotate-45 drop-shadow-md"></div>
                 <div className="absolute bottom-[5%] left-[15%] w-6 h-8 bg-gray-900 rounded-[50%] rotate-[60deg] drop-shadow-md"></div>
             </div>
+            
+
 
             <div className="relative w-full max-w-[650px] aspect-square z-10 hover:-translate-y-2 transition-transform duration-500">
               <div className="absolute inset-0 rounded-full overflow-hidden border-8 border-white shadow-2xl bg-white">
@@ -164,10 +169,7 @@ export default function LandingPage() {
           {/* Card 3 */}
           <article className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow cursor-pointer border border-gray-100 p-3 pb-6 group">
             <div className="w-full h-48 bg-gray-200 rounded-2xl overflow-hidden">
-                {/* Fallback image if unsplash isn't perfectly matched */}
-                <div className="w-full h-full bg-[#fde9cc] flex items-center justify-center">
-                    <span className="text-[#a53b1b] font-bold text-2xl">Pan de Cazón</span>
-                </div>
+                <img src="https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Pan de cazón" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
             </div>
             <h3 className="text-xl md:text-2xl font-bold mt-4 px-2 text-gray-900">Pan de cazón</h3>
             <div className="flex items-center gap-4 mt-2 px-2">

@@ -3,6 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import chefImg from '../assets/abuelita.png';
 import { api } from '../api/axios';
 import tomateImg from '../assets/tomate.png';
+import customLogo from '../assets/logo.png';
+import { useToast } from '../components/Toast';
+
+
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -12,6 +16,8 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const toast = useToast();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,10 +35,16 @@ export default function Register() {
         password_confirmation: passwordConfirmation 
       });
       localStorage.setItem('access_token', response.data.access_token);
+      toast.success('¡Registro exitoso! Bienvenido.');
       navigate('/my-recipes');
+
     } catch (err) {
       console.error("DEBUG ERR:", err.response?.data);
-      alert(JSON.stringify(err.response?.data?.errors || err.response?.data));
+      const errorMsg = err.response?.data?.errors 
+        ? Object.values(err.response.data.errors).flat().join(' ')
+        : err.response?.data?.message || 'Error en el registro';
+      toast.error(errorMsg);
+
       setError(err.response?.data?.message || 'Error en el registro. Verifica los datos.');
     } finally {
       setLoading(false);
@@ -46,10 +58,11 @@ export default function Register() {
         <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center h-full">
           {/* Left Side: Logo */}
           <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center group">
+            <Link to="/" className="flex items-center group gap-4">
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-inner transform group-hover:scale-105 transition-transform overflow-hidden p-2">
                 <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
               </div>
+                <img src={customLogo} alt="Salsa de Tomate" style={{width: '250px', marginTop: '8px'}} />
             </Link>
           </div>
           

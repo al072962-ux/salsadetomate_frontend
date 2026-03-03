@@ -2,12 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/axios';
 import tomateImg from '../assets/tomate.png';
+import customLogo from '../assets/logo.png';
+import { useToast } from '../components/Toast';
+
+
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [newCategoryName, setNewCategoryName] = useState('');
   const [loading, setLoading] = useState(true);
+  const toast = useToast();
+
 
   useEffect(() => {
     // Fetch categories
@@ -25,8 +31,10 @@ const Categories = () => {
         const res = await api.post('/categories', { name: newCategoryName });
         setCategories([...categories, res.data.data]);
         setNewCategoryName('');
+        toast.success('¡Categoría creada con éxito!');
+
       } catch (err) {
-        alert('Error al crear categoría');
+        toast.error('Error al crear categoría');
         console.error(err);
       }
     }
@@ -43,13 +51,11 @@ const Categories = () => {
       <header className="w-full h-24 bg-[#ffb800] px-8 flex justify-between items-center shadow-md relative z-50">
         <div className="max-w-[1400px] mx-auto w-full flex justify-between items-center h-full">
           {/* Logo Section */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <Link to="/" className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-inner transform group-hover:scale-105 pointer-events-auto transition-transform p-2">
+          <Link to="/" className="flex items-center gap-4 group">
+            <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-inner transform group-hover:scale-105 pointer-events-auto transition-transform p-2">
               <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
-            </Link>
-            <span className="text-2xl font-black text-[#1a2e35] tracking-tight hidden sm:block">
-              Salsa de Tomate
-            </span>
+            </div>
+              <img src={customLogo} alt="Salsa de Tomate" style={{width: '250px', marginTop: '8px'}} />
           </Link>
 
           {/* User Actions */}

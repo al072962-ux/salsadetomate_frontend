@@ -2,6 +2,10 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/axios';
 import tomateImg from '../assets/tomate.png';
+import customLogo from '../assets/logo.png';
+import { useToast } from '../components/Toast';
+
+
 
 const RecipeMedia = () => {
   const { id } = useParams();
@@ -9,6 +13,8 @@ const RecipeMedia = () => {
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const toast = useToast();
+
 
   useEffect(() => {
     const fetchMedia = async () => {
@@ -19,7 +25,7 @@ const RecipeMedia = () => {
         }
       } catch (err) {
         console.error(err);
-        alert('Error cargando medios de la receta');
+        toast.error('Error cargando medios de la receta');
         navigate('/my-recipes');
       } finally {
         setLoading(false);
@@ -39,18 +45,20 @@ const RecipeMedia = () => {
       })));
     } catch(err) {
       console.error(err);
-      alert('Error cambiando foto principal');
+      toast.error('Error cambiando foto principal');
     }
   };
 
   const handleDelete = async (mediaId) => {
-    if(!window.confirm('¿Seguro que deseas eliminar esta foto?')) return;
+    const confirmed = await toast.confirm('¿Seguro que deseas eliminar esta foto?', { danger: true, confirmText: 'Eliminar' });
+    if (!confirmed) return;
+
     try {
       await api.delete(`/recipes/${id}/media/${mediaId}`);
       setPhotos(photos.filter(p => p.id !== mediaId));
     } catch(err) {
       console.error(err);
-      alert('Error al eliminar la foto');
+      toast.error('Error al eliminar la foto');
     }
   };
 
@@ -73,7 +81,7 @@ const RecipeMedia = () => {
            setPhotos(prev => [...prev, res.data.data]);
        } catch (err) {
            console.error("Error al subir imagen:", err.response?.data || err.message);
-           alert('Hubo un error subiendo la imagen: ' + file.name);
+           toast.error('Hubo un error subiendo la imagen: ' + file.name);
        }
     }
     setUploading(false);
@@ -86,10 +94,11 @@ const RecipeMedia = () => {
     <div className="bg-gray-50 min-h-screen font-sans flex flex-col">
       <header className="w-full h-24 bg-[#ffb800] px-8 flex justify-between items-center shadow-md relative z-50">
         <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center h-full">
-          <Link to="/" className="flex items-center group">
+          <Link to="/" className="flex items-center group gap-4">
             <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-inner transform group-hover:scale-105 transition-transform overflow-hidden p-2">
               <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
             </div>
+              <img src={customLogo} alt="Salsa de Tomate" style={{width: '250px', marginTop: '8px'}} />
           </Link>
           <div className="flex gap-4">
             {localStorage.getItem('access_token') ? (

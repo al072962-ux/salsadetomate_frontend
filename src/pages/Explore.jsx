@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import recipeImg from '../assets/recipe_placeholder.png';
 import { api } from '../api/axios';
 import tomateImg from '../assets/tomate.png';
+import customLogo from '../assets/logo.png';
+
+
 
 function RecipeCard({ recipe }) {
   const imageUrl = recipe.main_image?.url || recipeImg;
@@ -184,10 +187,11 @@ export default function Explore() {
       <header className="w-full h-24 bg-[#ffb800] px-8 flex justify-between items-center shadow-md relative z-50">
         <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center h-full">
           <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center group">
+            <Link to="/" className="flex items-center group gap-4">
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-inner transform group-hover:scale-105 transition-transform overflow-hidden p-2">
                 <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
               </div>
+              <img src={customLogo} alt="Salsa de Tomate" style={{width: '250px', marginTop: '8px'}} />
             </Link>
           </div>
           

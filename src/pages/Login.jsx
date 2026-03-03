@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import chefImg from '../assets/abuelita.png';
 import { api } from '../api/axios';
 import tomateImg from '../assets/tomate.png';
+import customLogo from '../assets/logo.png';
+
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -33,10 +35,11 @@ export default function Login() {
         <div className="max-w-[1600px] mx-auto w-full flex justify-between items-center h-full">
           {/* Left Side: Logo */}
           <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center group">
+            <Link to="/" className="flex items-center group gap-4">
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-inner transform group-hover:scale-105 transition-transform overflow-hidden p-2">
                 <img src={tomateImg} alt="Tomate Logo" className="w-full h-full object-contain" />
               </div>
+                <img src={customLogo} alt="Salsa de Tomate" style={{width: '250px', marginTop: '8px'}} />
             </Link>
           </div>
           
